@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+  <section class="probootstrap-section">
+    <div class="container">
+      <div class="row heading">
+      </div>
+      <div class="row">
+
+      {% if question.image %}
+          <p><img src="{{question.image.url}}" class="img-responsive" alt="Free Bootstrap Template by uicookies.com"></p>
+      
+      {% else %}
+      {% endif %}
+        <div class="col-md-12">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+
+            <p>{{question.lesson_name}}</p>
+        </div>
+        
+      </div>
+        <p><a href="{% url 'core:add_answer' question.slug %}"> add your answer here </a> </p>
+    </div>
+  </section>
+        {% for a in answer %}
+
+          <p> {{ a.username }} </p>
+          <p> {{ a.description }} </p>
+          <p><a href='{{a.get_add_to_vote_url}}' class='btn btn-primary btn-md my-0 p'>add vote here</a></p>
+          <p><a href='{{a.get_remove_to_vote_url}}' class='btn btn-danger btn-md my-0 p'>remove vote here</a></p>
+        {% endfor %}
+
+            
+        {% for q in question.answers.all %}
+          <p> {{ q }} </p>
+        {% endfor %}
+        
+{% endblock content %}

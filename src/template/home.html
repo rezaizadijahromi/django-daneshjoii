@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<body>
+
+    {% for q in object_list %}
+   <div> <a href='{{q.get_absolute_url}}'>
+   {{ q.lesson_name }}
+   </a>
+   {{ q.ref_code }}
+    <a href='{{q.get_add_to_cart_url}}' class='btn btn-primary btn-md my-0 p'>
+        add your request
+    </a>
+   </div>
+    {% endfor %}
+</body>
+{% endblock content %}
