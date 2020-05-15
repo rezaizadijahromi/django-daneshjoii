@@ -12,6 +12,5 @@ urlpatterns = [
     path('question/<slug:slug>/answer/', views.AddAnswerToQuestion, name='add_answer'),
     path('answer/<int:id>/', views.LikeVote, name='add_vote'),
     path('delete/<int:id>/', views.DislikeVote, name='remove_vote'),
-    path('point/<int:user>/', views.point, name='point'),
 
 ]

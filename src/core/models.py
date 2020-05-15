@@ -50,38 +50,38 @@ class Daneshjoo(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     point = models.IntegerField(default=0)
 
+from datetime import datetime, timedelta
+def get_deadline():
+    return datetime.today() + timedelta(days=20)
+
 class Question(models.Model):
 
     lesson_name = models.ForeignKey('Lesson',on_delete=models.CASCADE)
     master_name = models.ForeignKey('MasterName',on_delete=models.CASCADE)
-    zaman_tahvil = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField()
     ref_code = models.CharField(max_length=5, blank=True, null=True)
     image = models.ImageField(upload_to='q_image/',null=True, blank=True)
-    date_time = models.DateTimeField(auto_now_add=True,null=True, blank=True)
-    # answers = models.ManyToManyField('Answer', related_name='answer',
-    #         blank=True)
+    date_time = models.DateField(default=datetime.today)
+    deadline = models.DateField(default=get_deadline)
+    answers = models.ManyToManyField('Answer',related_name='answer')
+    # zaman_tahvil = models.DateTimeField(auto_now_add=True)
+
     def save(self,*args, **kwargs):
         if not self.slug and self.ref_code:
             self.slug = slugify(self.ref_code)
         super(Question,self).save(*args, **kwargs)
 
 
-
-    def left_time(self):
-        time = self.upload_date - datetime.now()
-        return time
-
     def get_absolute_url(self):
         return reverse('core:question', kwargs={"slug": self.slug})
-    
+
     def get_add_to_cart_url(self):
         return reverse("core:add_request", kwargs={
             'slug': self.slug
         })
 
     def __str__(self):
-        return 'Thr question was {} from {} master with ref_code {}'.format(self.lesson_name, self.master_name, self.ref_code)
+        return 'The question was {} from {} master with ref_code {}'.format(self.lesson_name, self.master_name, self.ref_code)
 
 # def answer_submit(sender, **kwargs):
 #     if kwargs['instance'].answers.count() > 6:
@@ -135,6 +135,7 @@ class Answer(models.Model):
 
 class OrderAnswerSubmite(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
+    question = models.ForeignKey('Question', on_delete=models.CASCADE, null=True, blank=True)
     answer = models.ManyToManyField(Answer)
     ordered = models.BooleanField(default=False)
 

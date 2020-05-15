@@ -38,7 +38,7 @@ class Home(ListView):
     model = Question
     template_name = 'home.html'
 
-class  AddQ(View):
+class AddQ(View):
 
     def get(self, *args, **kwargs):
         question = Question.objects.all()
@@ -106,48 +106,23 @@ def add_request_quantity(request, slug):
 
 
 def AddAnswerToQuestion(request, slug):
-    question = get_object_or_404(Question, slug=slug)
-    q = question
-    # limit = Question.objects.filter(slug__in=slug).values('question__answer').annotate(Count('question__answer'))
-    # print(limit)
+    item = get_object_or_404(Question, slug=slug)
+
     form = AddAnswerForm()
-    answer = Answer.objects.filter(
-        question=q,
+    order_item = Answer.objects.filter(
         username=request.user,
+        question=item,
+        answered=False
     )
-    question = Question.objects.get(
-                    slug=slug
-                )
-    order_qs = OrderAnswerSubmite.objects.filter(user=request.user, ordered=False)
-    # if Answer.objects.filter(username=request.user, answered=True):
+
+    order_qs = OrderAnswerSubmite.objects.filter(user=request.user, ordered=False, question=item)
+
     if order_qs.exists():
         order = order_qs[0]
-        if order.answer.filter(question__slug=question.slug).exists() or OrderAnswerSubmite.objects.filter(user=request.user, ordered=True):
-            messages.info(request, 'You are aleready answer this question')
+        if order.answer.filter(question__slug=item.slug).exists():
+            messages.info(request, 'u already pick this asshole')
             return redirect('core:question', slug=slug)
-        else:
 
-            if request.method == 'POST':
-                form = AddAnswerForm(request.POST, request.FILES)
-                if form.is_valid():
-
-                    description = form.cleaned_data['description']
-                    image_answer = form.cleaned_data['image_answer']
-
-                    answer = Answer(
-                        username=request.user,
-                        question=Question.objects.get(slug=slug),
-                        description=description,
-                        image_answer=image_answer,
-                        answered=True
-                    )
-                    answer.save()
-
-
-                    order.answer.add(answer)
-
-                    messages.info(request, 'Answer submited successfully')
-                    return redirect('core:question', slug=slug)
     else:
         if request.method == 'POST':
             form = AddAnswerForm(request.POST, request.FILES)
@@ -164,6 +139,16 @@ def AddAnswerToQuestion(request, slug):
                     answered=True
                 )
                 answer.save()
+
+                # order = OrderAnswerSubmite.objects.create(
+                #     user=request.user, ordered=False
+                # )
+                order = OrderAnswerSubmite.objects.create(
+                    user=request.user,
+                    question=item
+                )
+                order.answer.add(answer)
+
                 messages.info(request, 'Answer submited successfully')
                 return redirect('core:question', slug=slug)
 
@@ -172,7 +157,64 @@ def AddAnswerToQuestion(request, slug):
         'form':form
     }
 
-    return render(request, 'add_answer.html', context)
+    return render(request, 'add_answer.html', context)                
+    
+    # else:
+
+    #     if request.method == 'POST':
+    #         form = AddAnswerForm(request.POST, request.FILES)
+    #         if form.is_valid():
+
+    #             description = form.cleaned_data['description']
+    #             image_answer = form.cleaned_data['image_answer']
+
+    #             answer = Answer(
+    #                 user=request.user,
+    #                 question=Question.objects.get(slug=slug),
+    #                 description=description,
+    #                 image_answer=image_answer,
+    #                 answered=True
+    #             )
+    #             answer.save()
+
+    #             order = OrderAnswerSubmite.objects.create(
+    #                 user=request.user
+    #             )
+    #             order.question.add(answer)
+
+    #             messages.info(request, 'Answer submited successfully')
+    #             return redirect('core:question', slug=slug)
+    #         else:
+    #             messages.info(request, 'form is not valid')
+    #             return redirect('core:question', slug=slug)
+    #     else:
+    #         messages.info(request, 'nothing posted')
+    #         return redirect('core:question', slug=slug)
+    # else:
+    #     if request.method == 'POST':
+    #         form = AddAnswerForm(request.POST, request.FILES)
+    #         if form.is_valid():
+
+    #             description = form.cleaned_data['description']
+    #             image_answer = form.cleaned_data['image_answer']
+
+    #             answer = Answer(
+    #                 username=request.user,
+    #                 question=Question.objects.get(slug=slug),
+    #                 description=description,
+    #                 image_answer=image_answer,
+    #                 answered=True
+    #             )
+    #             answer.save()
+    #             order = OrderAnswerSubmite.objects.create(
+    #                 user=request.user
+    #             )
+    #             order.answer.add(answer)
+    #             messages.info(request, 'Answer submited successfully')
+    #             return redirect('core:question', slug=slug)
+
+
+
 
 
 
