@@ -17,7 +17,8 @@
       <div class="row">
         <div class="col-md-12">
 
-            <p>{{question.lesson_name}}</p>
+            <p>lesson name: <strong>{{question.lesson_name}}</strong></p>
+            <p>days left for answer: <strong>{{question.get_time_left_for_answer}}</strong></p>
             {% comment %} <p>{{question.time_left}}</p> {% endcomment %}
         </div>
         
@@ -27,8 +28,8 @@
   </section>
         {% for a in answer %}
 
-          <p> {{ a.username }} </p>
-          <p> {{ a.description }} </p>
+          <p>Username: {{ a.username }} </p>
+          <p>description: {{ a.description }} </p>
           <p><a href='{{a.get_add_to_vote_url}}' class='btn btn-primary btn-md my-0 p'>add vote here</a></p>
           <p><a href='{{a.get_remove_to_vote_url}}' class='btn btn-danger btn-md my-0 p'>remove vote here</a></p>
         {% endfor %}

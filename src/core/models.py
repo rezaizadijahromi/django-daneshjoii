@@ -51,8 +51,8 @@ class Daneshjoo(models.Model):
     point = models.IntegerField(default=0)
 
 from datetime import datetime, timedelta
-def get_deadline():
-    return datetime.today() + timedelta(days=20)
+# def get_deadline():
+#     return datetime.today() + timedelta(days=20)
 
 class Question(models.Model):
 
@@ -61,15 +61,24 @@ class Question(models.Model):
     slug = models.SlugField()
     ref_code = models.CharField(max_length=5, blank=True, null=True)
     image = models.ImageField(upload_to='q_image/',null=True, blank=True)
-    date_time = models.DateField(default=datetime.today)
-    deadline = models.DateField(default=get_deadline)
+    day = models.IntegerField(default=0)
+    date = models.DateTimeField(default=datetime.today)
+    deadline = models.DateTimeField(default=datetime.today)
     answers = models.ManyToManyField('Answer',related_name='answer')
     # zaman_tahvil = models.DateTimeField(auto_now_add=True)
 
     def save(self,*args, **kwargs):
         if not self.slug and self.ref_code:
             self.slug = slugify(self.ref_code)
+        day = self.day
+        time = timedelta(days=day)
+        deadline = self.date + time
+        self.deadline = deadline
         super(Question,self).save(*args, **kwargs)
+
+    def get_time_left_for_answer(self):
+        time = self.deadline - self.date
+        return time.days
 
 
     def get_absolute_url(self):

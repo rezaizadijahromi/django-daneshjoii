@@ -11,7 +11,7 @@ class AddQuestion(forms.ModelForm):
         model = Question
         fields = (
             'lesson_name','master_name',
-            'image'
+            'image','day'
         )
 
 class AddAnswerForm(forms.Form):
