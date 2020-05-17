@@ -8,7 +8,7 @@
 
       {% if question.image %}
           <p><img src="{{question.image.url}}" class="img-responsive" alt="Free Bootstrap Template by uicookies.com"></p>
-      
+
       {% else %}
       {% endif %}
         <div class="col-md-12">
@@ -21,7 +21,7 @@
             <p>days left for answer: <strong>{{question.get_time_left_for_answer}}</strong></p>
             {% comment %} <p>{{question.time_left}}</p> {% endcomment %}
         </div>
-        
+
       </div>
         <p><a href="{% url 'core:add_answer' question.slug %}"> add your answer here </a> </p>
     </div>
@@ -34,9 +34,9 @@
           <p><a href='{{a.get_remove_to_vote_url}}' class='btn btn-danger btn-md my-0 p'>remove vote here</a></p>
         {% endfor %}
 
-            
+
         {% for q in question.answers.all %}
           <p> {{ q }} </p>
         {% endfor %}
-        
+
 {% endblock content %}

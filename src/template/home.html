@@ -1,17 +1,26 @@
-{% extends 'base.html' %}
 
+{% extends 'main.html' %}
+{% load static %}
 {% block content %}
-<body>
+	<div class="row">
+        
+		{% for q in object_list %}
 
-    {% for q in object_list %}
-   <div> <a href='{{q.get_absolute_url}}'>
-   {{ q.lesson_name }}
-   </a>
-   {{ q.ref_code }}
-    <a href='{{q.get_add_to_cart_url}}' class='btn btn-primary btn-md my-0 p'>
-        add your request
-    </a>
-   </div>
-    {% endfor %}
-</body>
+				<div class="col-lg-4">
+					<img class="thumbnail" src="{{q.image.url}}">
+					<div class="box-element product">
+						<h6><strong> {{q.lesson_name}} </strong></h6>
+						<hr>
+
+						<a class="btn btn-outline-success" href="{{ q.get_add_to_cart_url }}">request</a>
+						<a class="btn btn-outline-success" href="{{ q.get_absolute_url }}">View</a>
+						<h4 style="display: inline-block; float: right"><strong>{{q.ref_code}}</strong></h4>
+
+					</div>
+				</div>
+        {% endfor %}
+		
+
+	</div>
+
 {% endblock content %}

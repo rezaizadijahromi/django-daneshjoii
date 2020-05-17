@@ -76,7 +76,7 @@ def questionView(request, slug):
         'answer':answer
     }
 
-    return render(request, 'question.html', context)
+    return render(request, 'checkout.html', context)
 
 
 def add_request_quantity(request, slug):
