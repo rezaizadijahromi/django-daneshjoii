@@ -44,8 +44,12 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
 
     'crispy_forms',
-    
+
     'core',
+    'rest_framework',
+    'rest_framework.authtoken',
+
+
 ]
 SITE_ID = 1
 MIDDLEWARE = [
@@ -144,3 +148,18 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES':(
+
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES':(
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+
+    'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE':4,
+
+}

@@ -53,23 +53,29 @@ class Daneshjoo(models.Model):
 from datetime import datetime, timedelta
 # def get_deadline():
 #     return datetime.today() + timedelta(days=20)
+import random
+import string
+def create_ref_code():
+    return ''.join(random.choices(string.digits, k=5))
 
 class Question(models.Model):
 
     lesson_name = models.ForeignKey('Lesson',on_delete=models.CASCADE)
     master_name = models.ForeignKey('MasterName',on_delete=models.CASCADE)
-    slug = models.SlugField()
+    slug = models.SlugField(null=True, blank=True)
     ref_code = models.CharField(max_length=5, blank=True, null=True)
     image = models.ImageField(upload_to='q_image/',null=True, blank=True)
     day = models.IntegerField(default=0)
     date = models.DateTimeField(default=datetime.today)
     deadline = models.DateTimeField(default=datetime.today)
-    answers = models.ManyToManyField('Answer',related_name='answer')
+    answers = models.ManyToManyField('Answer',related_name='answer', blank=True)
     # zaman_tahvil = models.DateTimeField(auto_now_add=True)
 
     def save(self,*args, **kwargs):
         if not self.slug and self.ref_code:
             self.slug = slugify(self.ref_code)
+        self.ref_code = create_ref_code()
+        self.slug = self.ref_code
         day = self.day
         time = timedelta(days=day)
         deadline = self.date + time
@@ -82,10 +88,10 @@ class Question(models.Model):
 
 
     def get_absolute_url(self):
-        return reverse('core:question', kwargs={"slug": self.slug})
+        return reverse('core-app:question', kwargs={"slug": self.slug})
 
     def get_add_to_cart_url(self):
-        return reverse("core:add_request", kwargs={
+        return reverse("core-app:add_request", kwargs={
             'slug': self.slug
         })
 
@@ -127,18 +133,22 @@ class Answer(models.Model):
         return '{} answer the question'.format(self.username)
 
     def get_absolute_url(self):
-        return reverse('core:add_answer', kwargs={"slug": self.slug})
+        return reverse('core-app:add_answer', kwargs={"slug": self.slug})
 
     def get_add_to_vote_url(self):
-        return reverse("core:add_vote", kwargs={
+        return reverse("core-app:add_vote", kwargs={
             'id': self.id
         })
 
     def get_remove_to_vote_url(self):
-        return reverse("core:remove_vote", kwargs={
+        return reverse("core-app:remove_vote", kwargs={
             'id': self.id
         })
-
+    def get_answer_url(self):
+        return reverse('core-app:answer_detail', kwargs={
+            'slug': self.question.slug,
+            'id': self.id
+        })
     def __str__(self):
         return str(self.question)
 
@@ -147,6 +157,10 @@ class OrderAnswerSubmite(models.Model):
     question = models.ForeignKey('Question', on_delete=models.CASCADE, null=True, blank=True)
     answer = models.ManyToManyField(Answer)
     ordered = models.BooleanField(default=False)
+
+
+    def __str__(self):
+        return str(self.user)
 
 
 

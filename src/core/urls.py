@@ -10,6 +10,7 @@ urlpatterns = [
     path('question/<slug:slug>/', views.questionView, name='question'),
     path('question_tedad/<slug:slug>/', views.add_request_quantity, name='add_request'),
     path('question/<slug:slug>/answer/', views.AddAnswerToQuestion, name='add_answer'),
+    path('question/<slug:slug>/answer/<int:id>/', views.AnswerDetail, name='answer_detail'),
     path('answer/<int:id>/', views.LikeVote, name='add_vote'),
     path('delete/<int:id>/', views.DislikeVote, name='remove_vote'),
 

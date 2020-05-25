@@ -12,7 +12,7 @@
 						<hr>
 
 						<p>lesson name: <strong>{{question.lesson_name}}</strong></p>
-            <p>days left for answer: <strong>{{question.get_time_left_for_answer}}</strong></p>
+            <p>days left for answer: <strong>{{time_left}}</strong></p>
 						<h4 style="display: inline-block; float: right"><strong>{{q.ref_code}}</strong></h4>
                         <p><a href="{% url 'core:add_answer' question.slug %}"> add your answer here </a> </p>
 
@@ -67,7 +67,7 @@
                     <h3>Answer</h3>
                     <hr>
                     <div class="cart-row">
-                        <div style="flex:2"><img class="row-image" src="{{a.image_answer.url}}"></div>
+                        <div style="flex:2"><a href="{{ a.get_answer_url }}"><img class="row-image" src="{{a.image_answer.url}}"></a></div>
                         <div style="flex:2"><p>{{a.username}} 1</p></div>
                         <div style="flex:1"><p>{{a.description}}</p></div>
                         <div style="flex:1"><p><a href='{{a.get_add_to_vote_url}}' class='btn btn-primary btn-md my-0 p'>add vote here</a></p></div>

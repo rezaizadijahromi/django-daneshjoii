@@ -5,6 +5,9 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 
+from datetime import datetime, timezone
+
+
 from .models import (Question, Lesson, MasterName, User, 
         OrderQuestionQuantity,QuestionQuantity, Answer, OrderAnswerSubmite,
         AnswerQuantity, VoteOrder
@@ -61,19 +64,28 @@ class AddQ(View):
             form.save()
             q = question.ref_code
 
-            return redirect('core:question', slug=q)
+            return redirect('core-app:question', slug=q)
 
 
         else:
             form = AddQuestion()
 
+# def is_time_left(request, slug):
+#     question = get_object_or_404(Question, slug=slug)
+#     time_left = (question.deadline - datetime.now(timezone.utc)).days
+#     if time_left > 0:
+#         return True
+#     return False
 
+from datetime import datetime, timezone
 def questionView(request, slug):
     question = get_object_or_404(Question, slug=slug)
     answer = Answer.objects.filter(question=question)
+    time_left = (question.deadline - datetime.now(timezone.utc)).days
     context = {
         'question':question,
-        'answer':answer
+        'answer':answer,
+        'time_left':time_left
     }
 
     return render(request, 'checkout.html', context)
@@ -91,22 +103,28 @@ def add_request_quantity(request, slug):
         # check if the order item is in the order
         if order.question_req.filter(question__slug=item.slug).exists():
             messages.info(request, "You already pick this question")
-            return redirect("core:home")
+            return redirect("core-app:home")
         else:
             order.question_req.add(order_item)
             order_item.request_quantity += 1
+            order_item.save()
+
             messages.info(request, "This item was added to your cart.")
-            return redirect("core:home")
+            return redirect("core-app:home")
     else:
         order = OrderQuestionQuantity.objects.create(
             user=request.user)
         order.question_req.add(order_item)
+        order_item.save()
+
         messages.info(request, "This item was added to your cart.")
-        return redirect("core:question", slug=slug)
+        return redirect("core-app:question", slug=slug)
 
 
 def AddAnswerToQuestion(request, slug):
     item = get_object_or_404(Question, slug=slug)
+    left_time =  (item.deadline - datetime.now(timezone.utc)).days
+
 
     form = AddAnswerForm()
     order_item = Answer.objects.filter(
@@ -115,51 +133,192 @@ def AddAnswerToQuestion(request, slug):
         answered=False
     )
 
-    order_qs = OrderAnswerSubmite.objects.filter(user=request.user, ordered=False, question=item)
+    order_qs = OrderAnswerSubmite.objects.filter(
+        user=request.user,
+         ordered=False,
+          question=item
+    )
 
-    if order_qs.exists():
-        order = order_qs[0]
-        if order.answer.filter(question__slug=item.slug).exists():
-            messages.info(request, 'u already pick this asshole')
-            return redirect('core:question', slug=slug)
+    if left_time > 0:
+        if order_qs.exists():
+            order = order_qs[0]
+            if order.answer.filter(question__slug=item.slug).exists():
+                messages.info(request, 'u already pick this asshole')
+                return redirect('core-app:question', slug=slug)
+            else:
+                messages.info(request, 'Your answer must be deleted sorry you cant add answer to this question any more')
+                return redirect('core-app:question', slug=slug)
 
+        else:
+            if request.method == 'POST':
+                form = AddAnswerForm(request.POST, request.FILES)
+                if form.is_valid():
+
+                    description = form.cleaned_data['description']
+                    image_answer = form.cleaned_data['image_answer']
+
+                    answer = Answer(
+                        username=request.user,
+                        question=Question.objects.get(slug=slug),
+                        description=description,
+                        image_answer=image_answer,
+                        answered=True
+                    )
+                    answer.save()
+
+                    # order = OrderAnswerSubmite.objects.create(
+                    #     user=request.user, ordered=False
+                    # )
+                    order = OrderAnswerSubmite.objects.create(
+                        user=request.user,
+                        question=item
+                    )
+                    order.answer.add(answer)
+
+                    messages.info(request, 'Answer submited successfully')
+                    return redirect('core-app:question', slug=slug)
     else:
-        if request.method == 'POST':
-            form = AddAnswerForm(request.POST, request.FILES)
-            if form.is_valid():
-
-                description = form.cleaned_data['description']
-                image_answer = form.cleaned_data['image_answer']
-
-                answer = Answer(
-                    username=request.user,
-                    question=Question.objects.get(slug=slug),
-                    description=description,
-                    image_answer=image_answer,
-                    answered=True
-                )
-                answer.save()
-
-                # order = OrderAnswerSubmite.objects.create(
-                #     user=request.user, ordered=False
-                # )
-                order = OrderAnswerSubmite.objects.create(
-                    user=request.user,
-                    question=item
-                )
-                order.answer.add(answer)
-
-                messages.info(request, 'Answer submited successfully')
-                return redirect('core:question', slug=slug)
+        messages.info(request, 'Time for answering this question is over')
+        return redirect('core-app:question', slug=slug)
 
 
     context = {
         'form':form
     }
 
-    return render(request, 'add_answer.html', context)                
+    return render(request, 'add_answer.html', context)
+
+def AnswerToQuestion(request, slug):
+    item = get_object_or_404(Question, slug=slug)
+    left_time = (item.deadline - datetime.now(timezone.utc)).days
+
+    form = AddAnswerForm()
+    order_item = Answer.objects.filter(
+        username=request.user,
+        question=item,
+        answered=False
+    )
+
+    if left_time> 0:
+        if item.answers.filter().exists():
+            messages.info(request, 'u already pick this asshole')
+            return redirect('core:question', slug=slug)
+
+        else:
+             if request.method == 'POST':
+                form = AddAnswerForm(request.POST, request.FILES)
+                if form.is_valid():
+
+                    description = form.cleaned_data['description']
+                    image_answer = form.cleaned_data['image_answer']
+
+                    answer = Answer(
+                        username=request.user,
+                        question=Question.objects.get(slug=slug),
+                        description=description,
+                        image_answer=image_answer,
+                        answered=True
+                    )
+                    answer.save()
+
+                    q = Question.answers.add(answer)
+
+                    messages.info(request, 'Answer submited successfully')
+                    return redirect('core:question', slug=slug)
+    else:
+        messages.info(request, 'Time for answering this question is over')
+        return redirect('core:question', slug=slug)
+
+    context = {
+        'form':form
+    }
+
+    return render(request, 'add_answer.html', context)
+
     
-    # else:
+
+def LikeVote(request, id):
+    # user_point = User.objects.filter(user=request.user)
+    item = get_object_or_404(Answer, id=id)
+    order_item, created = AnswerQuantity.objects.get_or_create(
+        user=request.user,
+        answer=item
+    )
+    order_qs = VoteOrder.objects.filter(user=request.user, ordered=False)
+
+    if order_qs.exists():
+        order = order_qs[0]
+        if order.vote_request.filter(answer__id=item.id).exists():
+            messages.info(request, 'You vote this answer already')
+            return redirect('core:home')
+        else:
+            order.vote_request.add(order_item)
+            order_item.request_quantity += 1
+            order_item.save()
+            messages.info(request, 'Your vote submitet successfully')
+            return redirect('core:home')
+    else:
+        order = VoteOrder.objects.create(
+            user=request.user
+        )
+        order.vote_request.add(order_item)
+        order_item.request_quantity += 1
+        order_item.save()
+        messages.info(request, 'Your vote submitet successfully')
+        return redirect('core:home')
+
+
+def DislikeVote(request, id):
+    item = get_object_or_404(Answer, id=id)
+
+    order_qs = VoteOrder.objects.filter(
+        user=request.user,
+        ordered=False
+    )
+
+    if order_qs.exists():
+        order = order_qs[0]
+        if order.vote_request.filter(answer__id=item.id).exists():
+            order_item = AnswerQuantity.objects.filter(
+                user=request.user,
+                answer=item,
+            )[0]
+            if order_item.request_quantity >= 1:
+                order_item.request_quantity -= 1
+                order_item.save()
+                messages.info(request, 'You dislike this item')
+                return redirect('core:home')
+
+            elif order_item.request_quantity <= 0:
+                order_item.delete()
+                order.vote_request.remove(order_item)
+                item.delete()
+                messages.info(request, 'You dislike this item and the item deleted because of quantity is under 0')
+                return redirect('core:home')
+        else:
+            messages.info(request, 'You should first add vote then dislike it')
+            return redirect('core:home')
+
+    else:
+        messages.info(request, 'The item does not exists')
+        return redirect('core:home')
+
+def AnswerDetail(request, slug, id):
+    question = get_object_or_404(Question, slug=slug)
+    answer = Answer.objects.get(
+        question=question,
+        id=id,
+    )
+
+    context = {
+        'answer':answer
+    }
+
+    return render(request, 'answer.html', context)
+
+# def AddAnswerToQuestion
+
+ # else:
 
     #     if request.method == 'POST':
     #         form = AddAnswerForm(request.POST, request.FILES)
@@ -216,73 +375,6 @@ def AddAnswerToQuestion(request, slug):
 
 
 
-
-
-def LikeVote(request, id):
-    # user_point = User.objects.filter(user=request.user)
-    item = get_object_or_404(Answer, id=id)
-    order_item, created = AnswerQuantity.objects.get_or_create(
-        user=request.user,
-        answer=item
-    )
-    order_qs = VoteOrder.objects.filter(user=request.user, ordered=False)
-
-    if order_qs.exists():
-        order = order_qs[0]
-        if order.vote_request.filter(answer__id=item.id).exists():
-            messages.info(request, 'You vote this answer already')
-            return redirect('core:home')
-        else:
-            order.vote_request.add(order_item)
-            order_item.request_quantity += 1
-            order_item.save()
-            messages.info(request, 'Your vote submitet successfully')
-            return redirect('core:home')
-    else:
-        order = VoteOrder.objects.create(
-            user=request.user
-        )
-        order.vote_request.add(order_item)
-        order_item.request_quantity += 1
-        order_item.save()
-        messages.info(request, 'Your vote submitet successfully')
-        return redirect('core:home')
-
-
-def DislikeVote(request, id):
-    item = get_object_or_404(Answer, id=id)
-    
-    order_qs = VoteOrder.objects.filter(
-        user=request.user,
-        ordered=False
-    )
-
-    if order_qs.exists():
-        order = order_qs[0]
-        if order.vote_request.filter(answer__id=item.id).exists():
-            order_item = AnswerQuantity.objects.filter(
-                user=request.user,
-                answer=item,
-            )[0]
-            if order_item.request_quantity >= 1:
-                order_item.request_quantity -= 1
-                order_item.save()
-                messages.info(request, 'You dislike this item')
-                return redirect('core:home')
-
-            elif order_item.request_quantity <= 0:
-                order_item.delete()
-                order.vote_request.remove(order_item)
-                item.delete()
-                messages.info(request, 'You dislike this item and the item deleted because of quantity is under 0')
-                return redirect('core:home')
-        else:
-            messages.info(request, 'You should first add vote then dislike it')
-            return redirect('core:home')
-
-    else:
-        messages.info(request, 'The item does not exists')
-        return redirect('core:home')
 
 
 # def AddAnswerToQuestion(request, slug):
