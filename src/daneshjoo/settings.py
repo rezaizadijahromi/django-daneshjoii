@@ -163,3 +163,5 @@ REST_FRAMEWORK = {
     'PAGE_SIZE':4,
 
 }
+
+LOGIN_REDIRECT_URL = '/'

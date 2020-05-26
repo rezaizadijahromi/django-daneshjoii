@@ -4,7 +4,8 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from .views import (Question_api_view,QuestionDetail_api_view,
                     CreateUserView,CreateTokenView,ManageUserView,
                     AddQ,AddAnswerToQuestion,PostDetailAPIView,AddQ,
-                    AnswerListAPIView,AddRequestQuantity
+                    AnswerListAPIView,AddRequestQuantity,
+                    LikeVoteAPIView,DislikeVote
                     )
 
 from rest_framework.routers import DefaultRouter
@@ -29,5 +30,7 @@ urlpatterns = [
     # path('add_answer/',AddAnswerToQuestionAPIView.as_view(), name='answer'),
     # path('question/<slug:slug>/answer/',AddAnswerToQuestion_api_view, name='add_answer'),
     path('question_list/<slug:slug>/',QuestionDetail_api_view, name='question_detail'),
+    path('like/<int:id>/',LikeVoteAPIView.as_view(), name='like_vote'),
+    path('delete/<int:id>/',DislikeVote.as_view(), name='dislike_vote'),
 
 ]

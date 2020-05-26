@@ -115,6 +115,7 @@ def add_request_quantity(request, slug):
         order = OrderQuestionQuantity.objects.create(
             user=request.user)
         order.question_req.add(order_item)
+        order_item.request_quantity += 1
         order_item.save()
 
         messages.info(request, "This item was added to your cart.")
@@ -238,34 +239,71 @@ def AnswerToQuestion(request, slug):
     
 
 def LikeVote(request, id):
-    # user_point = User.objects.filter(user=request.user)
-    item = get_object_or_404(Answer, id=id)
+    
+    answer = get_object_or_404(Answer, id=id)
     order_item, created = AnswerQuantity.objects.get_or_create(
-        user=request.user,
-        answer=item
+        answer=answer
     )
-    order_qs = VoteOrder.objects.filter(user=request.user, ordered=False)
+
+    order_qs = VoteOrder.objects.filter(
+        user=request.user,
+        ordered=False,
+        answer=answer
+    )
 
     if order_qs.exists():
         order = order_qs[0]
-        if order.vote_request.filter(answer__id=item.id).exists():
+        if order.vote_request.filter(user__id=request.user).exists():
             messages.info(request, 'You vote this answer already')
-            return redirect('core:home')
+            return redirect('core-app:home')
         else:
-            order.vote_request.add(order_item)
-            order_item.request_quantity += 1
-            order_item.save()
-            messages.info(request, 'Your vote submitet successfully')
-            return redirect('core:home')
+            messages.info(request, 'You vote this answer already')
+            return redirect('core-app:home')
     else:
         order = VoteOrder.objects.create(
-            user=request.user
+            user=request.user,
+            answer=answer
         )
         order.vote_request.add(order_item)
         order_item.request_quantity += 1
         order_item.save()
-        messages.info(request, 'Your vote submitet successfully')
-        return redirect('core:home')
+        messages.info(request, 'Your vote submitet successfully here')
+        return redirect('core-app:home')          
+
+
+
+
+
+# def LikeVote(request, id):
+#     # user_point = User.objects.filter(user=request.user)
+#     item = get_object_or_404(Answer, id=id)
+#     order_item, created = AnswerQuantity.objects.get_or_create(
+#         user=request.user,
+#         answer=item
+#     )
+#     order_qs = VoteOrder.objects.filter(user=request.user, ordered=False)
+
+#     if order_qs.exists():
+#         order = order_qs[0]
+#         if order.vote_request.filter(answer__id=item.id).exists():
+#             messages.info(request, 'You vote this answer already')
+#             return redirect('core-app:home')
+#         else:
+#             order.vote_request.add(order_item)
+#             order_item.request_quantity += 1
+#             order_item.save()
+#             messages.info(request, 'Your vote submitet successfully')
+#             return redirect('core-app:home')
+#     else:
+#         order = VoteOrder.objects.create(
+#             user=request.user
+#         )
+#         order.vote_request.add(order_item)
+#         order_item.request_quantity += 1
+#         order_item.save()
+#         messages.info(request, 'Your vote submitet successfully here')
+#         return redirect('core-app:home')
+
 
 
 def DislikeVote(request, id):
@@ -275,9 +313,14 @@ def DislikeVote(request, id):
         user=request.user,
         ordered=False
     )
+    order_qs2 = OrderAnswerSubmite.objects.filter(
+        user=request.user,
+        ordered=False
+    )
 
-    if order_qs.exists():
+    if order_qs.exists() and order_qs2.exists():
         order = order_qs[0]
+        order2 = order_qs2[0]
         if order.vote_request.filter(answer__id=item.id).exists():
             order_item = AnswerQuantity.objects.filter(
                 user=request.user,
@@ -287,21 +330,21 @@ def DislikeVote(request, id):
                 order_item.request_quantity -= 1
                 order_item.save()
                 messages.info(request, 'You dislike this item')
-                return redirect('core:home')
+                return redirect('core-app:home')
 
             elif order_item.request_quantity <= 0:
                 order_item.delete()
                 order.vote_request.remove(order_item)
                 item.delete()
                 messages.info(request, 'You dislike this item and the item deleted because of quantity is under 0')
-                return redirect('core:home')
+                return redirect('core-app:home')
         else:
             messages.info(request, 'You should first add vote then dislike it')
-            return redirect('core:home')
+            return redirect('core-app:home')
 
     else:
         messages.info(request, 'The item does not exists')
-        return redirect('core:home')
+        return redirect('core-app:home')
 
 def AnswerDetail(request, slug, id):
     question = get_object_or_404(Question, slug=slug)

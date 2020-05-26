@@ -208,7 +208,7 @@ class AnswerQuantitySerializer(serializers.ModelSerializer):
         many=False
     )
 
-    
+
     class Meta:
         model = AnswerQuantity
         fields = (
@@ -216,3 +216,4 @@ class AnswerQuantitySerializer(serializers.ModelSerializer):
             'request_quantity',
             'answer'
         )
+        read_only_fields = ('user',)

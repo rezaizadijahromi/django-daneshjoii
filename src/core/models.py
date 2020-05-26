@@ -175,11 +175,15 @@ class OrderQuestionQuantity(models.Model):
     ordered = models.BooleanField(default=False)
 
 class AnswerQuantity(models.Model):
-    user = models.ForeignKey('User', on_delete=models.CASCADE,blank=True, null=True)
     request_quantity = models.IntegerField(default=0)
-    answer = models.ForeignKey('Answer', on_delete=models.CASCADE,blank=True, null=True)
+    answer = models.ForeignKey('Answer',
+        on_delete=models.CASCADE,
+         blank=True, null=True,
+         related_name='votes'
+    )
 
 class VoteOrder(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     vote_request = models.ManyToManyField('AnswerQuantity')
     ordered = models.BooleanField(default=False)
+    answer = models.ForeignKey('Answer', on_delete=models.CASCADE,blank=True, null=True)
