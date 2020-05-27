@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BAseUserAdmin
 
 from .models import (User, Question, Lesson, MasterName,OrderAnswerSubmite, 
         OrderQuestionQuantity, Answer, QuestionQuantity,
-        Like
+        Like,Dislike
 )
 
 
@@ -56,6 +56,6 @@ admin.site.register(OrderAnswerSubmite)
 admin.site.register(Answer)
 admin.site.register(QuestionQuantity)
 admin.site.register(Like)
-# admin.site.register(LikeCounter)
+admin.site.register(Dislike)
 
 

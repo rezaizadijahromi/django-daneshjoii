@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 
 from .models import (Question, Lesson, MasterName, User, 
         OrderQuestionQuantity,QuestionQuantity, Answer, OrderAnswerSubmite,
-        Like, 
+        Like, Dislike
 )
 from .forms import AddQuestion, AddAnswerForm
 
@@ -241,23 +241,78 @@ def AnswerToQuestion(request, slug):
 def LikeVote(request, id):
     
     answer = get_object_or_404(Answer, id=id)
-
+    answer_like = Answer()
 
     like_answer = Like.objects.get_or_create(
         answer=answer
     )[0]
 
+    answer.likes = like_answer
+    answer.save()
+
     if request.user not in like_answer.user.all():
         like_answer.counte += 1
         like_answer.user.add(request.user)
+        answer.likes = like_answer
         like_answer.save()
         messages.info(request, 'thanks')
         return redirect('core-app:home')
 
     else:
-        messages.info(request, 'u cant')
+        messages.info(request, 'You vote this answer already')
         return redirect('core-app:home')
 
+    context = {
+        'like_answer':like_answer
+    }
+    return render(request, 'checkout.html', context)
+
+def DislikeVote(request, id):
+    answer = get_object_or_404(Answer, id=id)
+
+    dislike_answer = Dislike.objects.get_or_create(
+        answer=answer
+    )[0]
+
+    answer.dislikes = dislike_answer
+    answer.save()
+
+    total = answer.likes.counte + answer.dislikes.counte
+    print(total)
+
+    if total > 0:
+
+        if request.user not in dislike_answer.user.all():
+            dislike_answer.counte -= 1
+            dislike_answer.user.add(request.user)
+            dislike_answer.save()
+            messages.info(request, 'You dislike this answer')
+            return redirect('core-app:home')
+        
+
+        else:
+            messages.info(request, 'You vote this answer already')
+            return redirect('core-app:home')
+
+    else:
+        if request.user not in dislike_answer.user.all():
+            # dislike_answer.counte -= 1
+            # dislike_answer.user.add(request.user)
+            # dislike_answer.save()
+            dislike_answer.delete()
+            messages.info(request, 'You dislike this answer')
+            return redirect('core-app:home')
+        
+
+        else:
+            messages.info(request, 'You vote this answer already')
+            return redirect('core-app:home')
+
+    context = {
+        'dislike':dislike_answer,
+        'total':total
+    }
+    return render(request, 'checkout.html', context)
 
 
 
@@ -311,8 +366,8 @@ def AnswerDetail(request, slug, id):
 #         return redirect('core-app:home')
 
 
-def DislikeVote(request, id):
-    item = get_object_or_404(Answer, id=id)
+# def DislikeVote(request, id):
+#     item = get_object_or_404(Answer, id=id)
 
 #     order_qs = VoteOrder.objects.filter(
 #         user=request.user,

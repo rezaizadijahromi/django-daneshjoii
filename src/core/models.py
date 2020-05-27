@@ -128,9 +128,26 @@ class Answer(models.Model):
     question = models.ForeignKey('Question', on_delete=models.CASCADE,
                     blank=True, null=True, related_name='question')
     answered = models.BooleanField(default=False)
+    likes = models.ForeignKey(
+            'Like',
+            on_delete=models.CASCADE, 
+            related_name='likes_answer',
+        blank=True, null=True
+        )
+    dislikes = models.ForeignKey(
+        'Dislike',
+        on_delete=models.CASCADE,
+        related_name='dislikes_answer',
+        blank=True, null=True
+     )
 
     def __str__(self):
         return '{} answer the question'.format(self.username)
+
+
+    def get_final_vote(self):
+        total = self.likes.counte + self.dislikes.counte
+        return total
 
     def get_absolute_url(self):
         return reverse('core-app:add_answer', kwargs={"slug": self.slug})
@@ -176,12 +193,17 @@ class OrderQuestionQuantity(models.Model):
 
 class Like(models.Model):
     user = models.ManyToManyField('User')
-    answer = models.ForeignKey(Answer, on_delete=models.DO_NOTHING)
-    # like = models.BooleanField(default=False)
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
     counte = models.IntegerField(default=0)
 
-# class LikeCounter(models.Model):
-#     answer = models.ForeignKey(Answer,
-#         on_delete=models.CASCADE
-#     )
-#     counter = models.IntegerField(default=0)
+    def like_vote(self):
+        return self.counte
+
+class Dislike(models.Model):
+    user = models.ManyToManyField('User')
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
+    counte = models.IntegerField(default=0)
+
+    def get_dislike_vote(self):
+        return self.counte
+
