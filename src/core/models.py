@@ -68,7 +68,7 @@ class Question(models.Model):
     day = models.IntegerField(default=0)
     date = models.DateTimeField(default=datetime.today)
     deadline = models.DateTimeField(default=datetime.today)
-    answers = models.ManyToManyField('Answer',related_name='answer', blank=True)
+    # answers = models.ManyToManyField('Answer',related_name='answer', blank=True)
     # zaman_tahvil = models.DateTimeField(auto_now_add=True)
 
     def save(self,*args, **kwargs):
