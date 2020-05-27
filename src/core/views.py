@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 
 from .models import (Question, Lesson, MasterName, User, 
         OrderQuestionQuantity,QuestionQuantity, Answer, OrderAnswerSubmite,
-        AnswerQuantity, VoteOrder
+        Like, 
 )
 from .forms import AddQuestion, AddAnswerForm
 
@@ -241,34 +241,40 @@ def AnswerToQuestion(request, slug):
 def LikeVote(request, id):
     
     answer = get_object_or_404(Answer, id=id)
-    order_item, created = AnswerQuantity.objects.get_or_create(
-        answer=answer
-    )
 
-    order_qs = VoteOrder.objects.filter(
-        user=request.user,
-        ordered=False,
-        answer=answer
-    )
 
-    if order_qs.exists():
-        order = order_qs[0]
-        if order.vote_request.filter(user__id=request.user).exists():
-            messages.info(request, 'You vote this answer already')
-            return redirect('core-app:home')
-        else:
-            messages.info(request, 'You vote this answer already')
-            return redirect('core-app:home')
+    like_answer = Like.objects.get_or_create(
+        answer=answer
+    )[0]
+
+    if request.user not in like_answer.user.all():
+        like_answer.counte += 1
+        like_answer.user.add(request.user)
+        like_answer.save()
+        messages.info(request, 'thanks')
+        return redirect('core-app:home')
+
     else:
-        order = VoteOrder.objects.create(
-            user=request.user,
-            answer=answer
-        )
-        order.vote_request.add(order_item)
-        order_item.request_quantity += 1
-        order_item.save()
-        messages.info(request, 'Your vote submitet successfully here')
-        return redirect('core-app:home')          
+        messages.info(request, 'u cant')
+        return redirect('core-app:home')
+
+
+
+
+
+def AnswerDetail(request, slug, id):
+    question = get_object_or_404(Question, slug=slug)
+    answer = Answer.objects.get(
+        question=question,
+        id=id,
+    )
+
+    context = {
+        'answer':answer
+    }
+
+    return render(request, 'answer.html', context)
+
 
 
 
@@ -305,59 +311,45 @@ def LikeVote(request, id):
 #         return redirect('core-app:home')
 
 
-
 def DislikeVote(request, id):
     item = get_object_or_404(Answer, id=id)
 
-    order_qs = VoteOrder.objects.filter(
-        user=request.user,
-        ordered=False
-    )
-    order_qs2 = OrderAnswerSubmite.objects.filter(
-        user=request.user,
-        ordered=False
-    )
+#     order_qs = VoteOrder.objects.filter(
+#         user=request.user,
+#         ordered=False
+#     )
+#     order_qs2 = OrderAnswerSubmite.objects.filter(
+#         user=request.user,
+#         ordered=False
+#     )
 
-    if order_qs.exists() and order_qs2.exists():
-        order = order_qs[0]
-        order2 = order_qs2[0]
-        if order.vote_request.filter(answer__id=item.id).exists():
-            order_item = AnswerQuantity.objects.filter(
-                user=request.user,
-                answer=item,
-            )[0]
-            if order_item.request_quantity >= 1:
-                order_item.request_quantity -= 1
-                order_item.save()
-                messages.info(request, 'You dislike this item')
-                return redirect('core-app:home')
+#     if order_qs.exists() and order_qs2.exists():
+#         order = order_qs[0]
+#         order2 = order_qs2[0]
+#         if order.vote_request.filter(answer__id=item.id).exists():
+#             order_item = AnswerQuantity.objects.filter(
+#                 user=request.user,
+#                 answer=item,
+#             )[0]
+#             if order_item.request_quantity >= 1:
+#                 order_item.request_quantity -= 1
+#                 order_item.save()
+#                 messages.info(request, 'You dislike this item')
+#                 return redirect('core-app:home')
 
-            elif order_item.request_quantity <= 0:
-                order_item.delete()
-                order.vote_request.remove(order_item)
-                item.delete()
-                messages.info(request, 'You dislike this item and the item deleted because of quantity is under 0')
-                return redirect('core-app:home')
-        else:
-            messages.info(request, 'You should first add vote then dislike it')
-            return redirect('core-app:home')
+#             elif order_item.request_quantity <= 0:
+#                 order_item.delete()
+#                 order.vote_request.remove(order_item)
+#                 item.delete()
+#                 messages.info(request, 'You dislike this item and the item deleted because of quantity is under 0')
+#                 return redirect('core-app:home')
+#         else:
+#             messages.info(request, 'You should first add vote then dislike it')
+#             return redirect('core-app:home')
 
-    else:
-        messages.info(request, 'The item does not exists')
-        return redirect('core-app:home')
-
-def AnswerDetail(request, slug, id):
-    question = get_object_or_404(Question, slug=slug)
-    answer = Answer.objects.get(
-        question=question,
-        id=id,
-    )
-
-    context = {
-        'answer':answer
-    }
-
-    return render(request, 'answer.html', context)
+#     else:
+#         messages.info(request, 'The item does not exists')
+#         return redirect('core-app:home')
 
 # def AddAnswerToQuestion
 

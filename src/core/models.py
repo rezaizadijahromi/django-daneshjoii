@@ -174,16 +174,14 @@ class OrderQuestionQuantity(models.Model):
     question_req = models.ManyToManyField(QuestionQuantity)
     ordered = models.BooleanField(default=False)
 
-class AnswerQuantity(models.Model):
-    request_quantity = models.IntegerField(default=0)
-    answer = models.ForeignKey('Answer',
-        on_delete=models.CASCADE,
-         blank=True, null=True,
-         related_name='votes'
-    )
+class Like(models.Model):
+    user = models.ManyToManyField('User')
+    answer = models.ForeignKey(Answer, on_delete=models.DO_NOTHING)
+    # like = models.BooleanField(default=False)
+    counte = models.IntegerField(default=0)
 
-class VoteOrder(models.Model):
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
-    vote_request = models.ManyToManyField('AnswerQuantity')
-    ordered = models.BooleanField(default=False)
-    answer = models.ForeignKey('Answer', on_delete=models.CASCADE,blank=True, null=True)
+# class LikeCounter(models.Model):
+#     answer = models.ForeignKey(Answer,
+#         on_delete=models.CASCADE
+#     )
+#     counter = models.IntegerField(default=0)

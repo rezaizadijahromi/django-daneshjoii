@@ -195,56 +195,11 @@ class AddRequestQuantity(generics.CreateAPIView):
 
 class LikeVoteAPIView(generics.CreateAPIView):
 
-    serializer_class = AnswerQuantitySerializer
-
-    def perform_create(self, serializer):
-        answer = get_object_or_404(
-            Answer, id= self.kwargs['id']
-        )
-
-        order_item, created = AnswerQuantity.objects.get_or_create(
-            user=self.request.user,
-            answer=answer
-        )
-
-        order_qs = VoteOrder.objects.filter(
-            user=self.request.user,
-            ordered=False
-        )
-
-        if order_qs.exists():
-            order = order_qs[0]
-            if order.vote_request.filter(answer__id=answer.id).exists():
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-
-            else:
-                order.vote_request.add(order_item)
-                order_item.request_quantity += 1
-                order_item.save()
-                return Response(
-                    status=status.HTTP_202_ACCEPTED
-                )
-        else:
-            order = VoteOrder.objects.create(
-                user=self.request.user
-            )
-            order.vote_request.add(order_item)
-            order_item.request_quantity += 1
-            order_item.save()
-
-            return Response(
-                status=status.HTTP_201_CREATED
-            )
-
-        serializer.save(user=self.request.user)
+    pass
 
 class DislikeVote(generics.DestroyAPIView):
 
-    serializer_class = AnswerQuantitySerializer
-    queryset = AnswerQuantity.objects.all()
-
-
-
+    pass
 
 
 

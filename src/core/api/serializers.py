@@ -202,18 +202,4 @@ class QuestionQuantitySerializer(serializers.ModelSerializer):
 
 class AnswerQuantitySerializer(serializers.ModelSerializer):
 
-
-    answer = serializers.PrimaryKeyRelatedField(
-        read_only=True,
-        many=False
-    )
-
-
-    class Meta:
-        model = AnswerQuantity
-        fields = (
-            'user',
-            'request_quantity',
-            'answer'
-        )
-        read_only_fields = ('user',)
+    pass
