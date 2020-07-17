@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
 
     'crispy_forms',
-
+    'core_new_v',
     'core',
     'rest_framework',
     'rest_framework.authtoken',
@@ -140,7 +140,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL = 'core_new_v.User'
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
