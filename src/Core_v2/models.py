@@ -10,4 +10,4 @@ class UserManager(BaseUserManager):
     def creat_user(self, email, password=None, *args, **kwargs):
         if "gmail.com" not in email:
             raise ValidationError('gmail.com shold be in email')
-        user = 
+        user = self.model(email=self.normalize_email(email))
