@@ -7,6 +7,7 @@ from django.utils.text import slugify
 
 from django.db.models.signals import m2m_changed
 from django.core.exceptions import ValidationError
+from django.db.models.signals import pre_save, post_save
 
 class UserManager(BaseUserManager):
 
@@ -68,6 +69,7 @@ class Question(models.Model):
     day = models.IntegerField(default=0)
     date = models.DateTimeField(default=datetime.today)
     deadline = models.DateTimeField(default=datetime.today)
+    quentity = models.IntegerField(default=0)
     # answers = models.ManyToManyField('Answer',related_name='answer', blank=True)
     # zaman_tahvil = models.DateTimeField(auto_now_add=True)
 
@@ -97,6 +99,17 @@ class Question(models.Model):
 
     def __str__(self):
         return 'The question was {} from {} master with ref_code {}'.format(self.lesson_name, self.master_name, self.ref_code)
+
+def quentity_post_save(sender,created , instance, *args, **kwargs):
+    
+    questions = Question.objects.all()
+    total = 0
+    for x in questions:
+        total += 1
+    instance.quentity = total
+    instance.save()
+
+post_save.connect(quentity_post_save, sender=Question)
 
 # def answer_submit(sender, **kwargs):
 #     if kwargs['instance'].answers.count() > 6:
@@ -175,6 +188,7 @@ class OrderAnswerSubmite(models.Model):
     answer = models.ManyToManyField(Answer)
     ordered = models.BooleanField(default=False)
 
+    
 
     def __str__(self):
         return str(self.user)
