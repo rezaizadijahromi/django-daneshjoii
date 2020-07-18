@@ -13,19 +13,17 @@ class AddQuetionForm(forms.ModelForm):
         )
 
 class AddAnswerForm(forms.ModelForm):
-    # description = forms.CharField(
-    #     widget=forms.Textarea(
-    #         attrs={
-    #             'rows':'4'
-    #         }
-    #     )
-    # )
-    # image_answer = forms.ImageField()
+    description = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'rows':'4'
+            }
+        )
+    )
+    image_answer = forms.ImageField()
 
     class Meta:
         model = Answer
         fields = (
             'username',
-            'description',
-            'image_answer'
         )

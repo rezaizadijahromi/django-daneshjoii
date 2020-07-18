@@ -85,11 +85,14 @@ def AddAnswerToQuestion(request, slug):
 
     form = AddAnswerForm()
     if left_time > 0:
-        if request.user.is_authenticated:
+        if answer.exists():
             if request.user in question.user_answer.all() or question.answers.all()  :
                 print("We are here")
                 messages.info(request, "You answer this question")
                 return redirect('core-v2:question', slug=slug)
+            # else:
+            #     messages.info(request, "Here the problems")
+            #     return redirect("core-v2:question", slug=slug)
             else:
                 print(request)
                 if request.method == 'POST':
@@ -114,12 +117,12 @@ def AddAnswerToQuestion(request, slug):
                 else:
                     messages.info(request, "Reqeust failed")
                     return redirect("core-v2:question", slug=slug)
-        else:
-            messages.info(request, "You should Login first")
-            return redirect("core-v2:question", slug=slug)
+
     else:
         messages.info(request, "Time for answering this question is over")
         return redirect("core-v2:question", slug=slug)
+
+
 
 
 def LikeView(request, slug):
@@ -144,7 +147,7 @@ def AnswerDetail(request, slug, id):
         'answer':answer
     }
 
-    return render(request, 'answer.html', context)
+    return render(request, 'answerv2.html', context)
 
 
 
@@ -152,51 +155,57 @@ def AnswerDetail(request, slug, id):
 # def AddAnswerToQuestion(request, slug):
 #     question = get_object_or_404(Question, slug=slug)
 #     left_time = (question.deadline - datetime.now(timezone.utc)).days
-
+#     answer = Answer.objects.filter(
+#         username=request.user,
+#         question=question
+#     )
 #     form = AddAnswerForm()
+    
+
 #     if left_time > 0:
-#         if request.user.is_authenticated:
-#             if request.user not in question.user_answer.all():
-#                 if request.method == 'POST':
-#                     print("We are in post method")
-#                     form = AddAnswerForm(request.POST, request.FILES)
-#                     if form.is_valid():
-#                         description = form.cleaned_data['description']
-#                         image_answer = form.cleaned_data['image_answer']
-                        
-#                         answer = Answer(
-#                             username=request.user,
-#                             question=Question.objects.get(slug=slug),
-#                             description=description,
-#                             image_answer=image_answer
-#                         )
-#                         answer.save()
-#                         question.answers.add(answer)
-#                         question.user_answer.add(request.user)
-#                         question.save()
-#                         messages.info(request, "Answer Submited")
-#                         return redirect('core-v2:question', slug=slug)
+#         if answer.exists():
+#             if request.user.is_authenticated:
+#                 if request.user not in question.user_answer.all():
+#                     if request.method == 'POST':
+#                         print("We are in post method")
+#                         form = AddAnswerForm(request.POST, request.FILES)
+#                         if form.is_valid():
+#                             description = form.cleaned_data['description']
+#                             image_answer = form.cleaned_data['image_answer']
+                            
+#                             answer = Answer(
+#                                 username=request.user,
+#                                 question=Question.objects.get(slug=slug),
+#                                 description=description,
+#                                 image_answer=image_answer
+#                             )
+#                             answer.save()
+#                             question.answers.add(answer)
+#                             question.user_answer.add(request.user)
+#                             question.save()
+#                             messages.info(request, "Answer Submited")
+#                             return redirect('core-v2:question', slug=slug)
+#                         else:
+#                             messages.info(request, "Error")
+#                             return redirect('core-v2:question', slug=slug)
 #                     else:
-#                         messages.info(request, "Error")
+#                         print("Error1")
+#                         form = AddAnswerForm()
+#                         messages.info(request, "Post request failed")
 #                         return redirect('core-v2:question', slug=slug)
 #                 else:
-#                     print("Error1")
-#                     form = AddAnswerForm()
-#                     messages.info(request, "Not valid")
+#                     print("Error2")
+
+#                     messages.info(request, "You already answer this question")
 #                     return redirect('core-v2:question', slug=slug)
 #             else:
-#                 print("Error2")
-
-#                 messages.info(request, "You already answer this question")
+#                 print("Error3")
+#                 messages.info(request, "You should Login for answering this question")
 #                 return redirect('core-v2:question', slug=slug)
 #         else:
-#             print("Error3")
-#             messages.info(request, "You should Login for answering this question")
+#             print("Error4")
+#             messages.info(request, "Time for answering this question is over")
 #             return redirect('core-v2:question', slug=slug)
-#     else:
-#         print("Error4")
-#         messages.info(request, "Time for answering this question is over")
-#         return redirect('core-v2:question', slug=slug)
 
 
 

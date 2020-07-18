@@ -151,7 +151,7 @@ def AddAnswerToQuestion(request, slug):
                 return redirect('core-app:question', slug=slug)
 
         else:
-            if request.method == 'POST':
+            if request.method == "POST":
                 form = AddAnswerForm(request.POST, request.FILES)
                 if form.is_valid():
 

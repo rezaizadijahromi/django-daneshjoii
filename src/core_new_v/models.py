@@ -164,6 +164,15 @@ class Answer(models.Model):
     def get_absolute_url(self):
         return reverse('core-v2:add_answer', kwargs={"slug": self.slug})
 
+    def get_answer_url(self):
+        return reverse(
+            "core-v2:answer_detail",
+            kwargs={
+                'slug':self.question.slug,
+                'id':self.id
+            }
+        )
+
     objects = AnswerManager()
 
     def __str__(self):

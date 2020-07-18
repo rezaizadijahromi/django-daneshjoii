@@ -14,7 +14,7 @@
 						<p>lesson name: <strong>{{question.lesson_name}}</strong></p>
             <p>days left for answer: <strong>{{time_left}}</strong></p>
 						<h4 style="display: inline-block; float: right"><strong>{{q.ref_code}}</strong></h4>
-                        {% comment %} <p><a href="{% url 'core-v2:add_answer'  %}"> add your answer here </a> </p> {% endcomment %}
+                        <p><a href="{% url 'core-v2:add_answer' question.slug %}"> add your answer here </a> </p> 
 
 					</div>
 				
