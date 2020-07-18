@@ -25,7 +25,7 @@ urlpatterns = [
     # # path('api-core/', include('core.api.urls')),
 
     # path('', include('core.urls', namespace='core-app')),
-    path('v2/', include('core_new_v.urls', namespace='core-v2')),
+    path('', include('core_new_v.urls', namespace='core-v2')),
 ]
 
 if settings.DEBUG:
