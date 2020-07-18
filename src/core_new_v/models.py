@@ -103,11 +103,19 @@ class Question(models.Model):
     day = models.IntegerField(default=0)
     date = models.DateTimeField(default=datetime.today)
     deadline = models.DateTimeField(default=datetime.today)
+    answers = models.ManyToManyField(
+        'Answer',related_name='answered',
+        blank=True
+
+    )
+    user_answer = models.ManyToManyField(
+        User,
+        blank=True
+    )
 
     def __str__(self):
         return str(self.ref_code)
     
-    # answers = models.ManyToManyField(Answer)
 
     
         
@@ -124,3 +132,32 @@ def pre_save_slug_ref_code(sender, instance, *args, **kwargs):
     print("running")
 
 pre_save.connect(pre_save_slug_ref_code, sender=Question)
+
+
+class AnswerManager(models.Manager):
+    def toggle_like(self, user, answer_obj):
+        if user in answer_obj.liked.all():
+            is_liked = False
+            answer_obj.liked.remove(user)
+        else:
+            is_liked = True
+            answer_obj.liked.add(user)
+
+        return is_liked
+
+
+
+class Answer(models.Model):
+    username = models.ForeignKey(User, on_delete=models.CASCADE)
+    description = models.TextField()
+    image_answer = models.ImageField(upload_to='answers/')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    liked = models.ManyToManyField(
+        User, related_name='liked',
+        blank=True
+    )
+
+    objects = AnswerManager()
+
+    def __str__(self):
+        return self.username
