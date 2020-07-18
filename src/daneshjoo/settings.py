@@ -45,7 +45,6 @@ INSTALLED_APPS = [
 
     'crispy_forms',
     'core_new_v',
-    'core',
     'rest_framework',
     'rest_framework.authtoken',
 
@@ -89,7 +88,7 @@ WSGI_APPLICATION = 'daneshjoo.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'daneshjoii',
+        'NAME': 'daneshjoii_v2',
         'USER': 'postgres',
         'PASSWORD': 'aloneking',
         'HOST': '127.0.0.1',

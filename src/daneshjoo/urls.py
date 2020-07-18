@@ -21,10 +21,11 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    path('api-auth/', include('rest_framework.urls')),
-    path('api-core/', include('core.api.urls')),
+    # path('api-auth/', include('rest_framework.urls')),
+    # # path('api-core/', include('core.api.urls')),
 
-    path('', include('core.urls', namespace='core-app'))
+    # path('', include('core.urls', namespace='core-app')),
+    path('v2/', include('core_new_v.urls', namespace='core-v2')),
 ]
 
 if settings.DEBUG:

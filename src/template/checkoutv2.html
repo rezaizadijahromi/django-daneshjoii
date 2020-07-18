@@ -1,0 +1,95 @@
+{% extends 'mainv2.html' %}
+
+{% load static %}
+{% block content %}
+     <div class="row">
+		<div class="col-lg-6">
+			<div class="box-element" id="form-wrapper">
+
+            		<img class="thumbnail" src="{{question.image.url}}">
+					<div class="box-element product">
+						<h6><strong> {{q.lesson_name}} </strong></h6>
+						<hr>
+
+						<p>lesson name: <strong>{{question.lesson_name}}</strong></p>
+            <p>days left for answer: <strong>{{time_left}}</strong></p>
+						<h4 style="display: inline-block; float: right"><strong>{{q.ref_code}}</strong></h4>
+                        <p><a href="{% url 'core-v2:add_answer' question.slug %}"> add your answer here </a> </p>
+
+					</div>
+				
+			</div>
+
+			<br>
+			<div class="box-element hidden" id="payment-info">
+				<small>Paypal Options</small>
+			</div>
+			
+		</div>
+        {% for a in answer %}
+            <div class="col-lg-6">
+                <div class="box-element">
+                    <a  class="btn btn-outline-dark" href="/">&#x2190; Back to Home</a>
+                    <hr>
+                    <h3>Answer</h3>
+                    <hr>
+                    <div class="cart-row">
+                        <div style="flex:2"><a href="{{ a.get_answer_url }}"><img class="row-image" src="{{a.image_answer.url}}"></a></div>
+                        <div style="flex:2"><p>{{a.username}} 1</p></div>
+                        <div style="flex:1"><p>{{a.description}}</p></div>
+                        <div style="flex:1"><p><a href='{{a.get_add_to_vote_url}}' class='btn btn-primary btn-md my-0 p'>add vote here</a></p></div>
+                        <div style="flex:1"><p><a href='{{a.get_remove_to_vote_url}}' class='btn btn-danger btn-md my-0 p'>remove vote here</a></p></div>
+                    </div>
+					{% if a.likes.counte %}
+                    <h5>likes:   {{ a.likes.counte }}</h5>
+					{% endif %}
+					{% if a.dislikes.counte %}
+
+                    <h5>dislikes:   {{ a.dislikes.counte }}</h5>
+					{% endif %}
+					{% if a.likes.counte and a.dislikes.counte %}
+                    
+					<h5>Total Likes:   {{a.get_final_vote}} </h5>
+					{% else %}
+
+					{% endif %} 
+                </div>
+            </div>
+        {% endfor %} 
+	</div>
+{% endblock content %}
+
+{% comment %} <form id="form">
+					<div id="user-info">
+						<div class="form-field">
+							<input required class="form-control" type="text" name="name" placeholder="Name..">
+						</div>
+						<div class="form-field">
+							<input required class="form-control" type="email" name="email" placeholder="Email..">
+						</div>
+					</div>
+					
+					<div id="shipping-info">
+						<hr>
+						<p>Shipping Information:</p>
+						<hr>
+						<div class="form-field">
+							<input class="form-control" type="text" name="address" placeholder="Address..">
+						</div>
+						<div class="form-field">
+							<input class="form-control" type="text" name="city" placeholder="City..">
+						</div>
+						<div class="form-field">
+							<input class="form-control" type="text" name="state" placeholder="State..">
+						</div>
+						<div class="form-field">
+							<input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
+						</div>
+						<div class="form-field">
+							<input class="form-control" type="text" name="country" placeholder="Zip code..">
+						</div>
+					</div>
+
+					<hr>
+					<input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">
+				</form> {% endcomment %}

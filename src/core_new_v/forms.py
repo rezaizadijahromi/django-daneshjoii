@@ -9,7 +9,7 @@ class AddQuetionForm(forms.ModelForm):
         model = Question
         fields = (
             'lesson_name','master_name',
-            'iamge', 'day'
+            'image', 'day'
         )
 
 class AddAnswerForm(forms.Form):

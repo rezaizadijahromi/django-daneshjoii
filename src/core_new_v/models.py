@@ -5,6 +5,7 @@ from django.contrib.auth.models import (
     PermissionsMixin
 )
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 
 
 class UserManager(BaseUserManager):
@@ -106,8 +107,11 @@ class Question(models.Model):
     answers = models.ManyToManyField(
         'Answer',related_name='answered',
         blank=True
-
     )
+    
+    def get_absolute_url(self):
+        return reverse("core-v2:question", kwargs={"slug": self.slug})
+    
     user_answer = models.ManyToManyField(
         User,
         blank=True
@@ -157,7 +161,10 @@ class Answer(models.Model):
         blank=True
     )
 
+    def get_absolute_url(self):
+        return reverse('core-v2:add_answer', kwargs={"slug": self.slug})
+
     objects = AnswerManager()
 
     def __str__(self):
-        return self.username
+        return str(self.username)
