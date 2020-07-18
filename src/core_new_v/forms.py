@@ -12,18 +12,20 @@ class AddQuetionForm(forms.ModelForm):
             'image', 'day'
         )
 
-class AddAnswerForm(forms.Form):
-    description = forms.CharField(
-        widget=forms.Textarea(
-            attrs={
-                'rows':'4'
-            }
-        )
-    )
-    image_answer = forms.ImageField()
+class AddAnswerForm(forms.ModelForm):
+    # description = forms.CharField(
+    #     widget=forms.Textarea(
+    #         attrs={
+    #             'rows':'4'
+    #         }
+    #     )
+    # )
+    # image_answer = forms.ImageField()
 
     class Meta:
         model = Answer
         fields = (
-            'username'
+            'username',
+            'description',
+            'image_answer'
         )

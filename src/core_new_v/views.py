@@ -77,14 +77,21 @@ def AddAnswerToQuestion(request, slug):
     question = get_object_or_404(Question, slug=slug)
     left_time = (question.deadline - datetime.now(timezone.utc)).days
 
+
+    answer = Answer.objects.filter(
+        username=request.user,
+        question=question
+    )
+
     form = AddAnswerForm()
     if left_time > 0:
         if request.user.is_authenticated:
-            if request.user in question.user_answer.all():
+            if request.user in question.user_answer.all() or question.answers.all()  :
                 print("We are here")
                 messages.info(request, "You answer this question")
                 return redirect('core-v2:question', slug=slug)
             else:
+                print(request)
                 if request.method == 'POST':
                     form = AddAnswerForm(request.POST, request.FILES)
                     if form.is_valid():
@@ -92,8 +99,6 @@ def AddAnswerToQuestion(request, slug):
                         image_answer = form.cleaned_data['image_answer']
                         
                         answer = Answer(
-                            username=request.user,
-                            question=Question.objects.get(slug=slug),
                             description=description,
                             image_answer=image_answer
                         )
@@ -107,7 +112,7 @@ def AddAnswerToQuestion(request, slug):
                         messages.info(request, "Error")
                         return redirect('core-v2:question', slug=slug)
                 else:
-                    messages.info(request, "request failed")
+                    messages.info(request, "Reqeust failed")
                     return redirect("core-v2:question", slug=slug)
         else:
             messages.info(request, "You should Login first")
@@ -115,6 +120,31 @@ def AddAnswerToQuestion(request, slug):
     else:
         messages.info(request, "Time for answering this question is over")
         return redirect("core-v2:question", slug=slug)
+
+
+def LikeView(request, slug):
+    answer = Answer.objects.filter(slug=slug)
+    
+    if request.user.is_authenticated:
+        is_like = Answer.objects.toggle_like(request.user, answer.first())
+        messages.info(request, "Thanks")
+        return redirect('core-v2:home')
+    else:
+        messages.info(request, "You sould login first")
+        return redirect("core-v2:home")
+
+def AnswerDetail(request, slug, id):
+    question = get_object_or_404(Question, slug=slug)
+    answer = Answer.objects.get(
+        question=question,
+        id=id,
+    )
+
+    context = {
+        'answer':answer
+    }
+
+    return render(request, 'answer.html', context)
 
 
 
