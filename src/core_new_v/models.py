@@ -174,6 +174,14 @@ class Answer(models.Model):
             }
         )
 
+    def get_like_url(self):
+        return reverse(
+            'core-v2:like',
+            kwargs={
+                "id":self.id
+            }
+        )
+
     objects = AnswerManager()
 
     def __str__(self):

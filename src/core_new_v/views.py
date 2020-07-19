@@ -130,8 +130,8 @@ def AddAnswerToQuestion(request, slug):
     return render(request, 'add_answerv2.html', context)
 
 
-def LikeView(request, slug):
-    answer = Answer.objects.filter(slug=slug)
+def LikeView(request, id):
+    answer = Answer.objects.filter(id=id)
     
     if request.user.is_authenticated:
         is_like = Answer.objects.toggle_like(request.user, answer.first())
@@ -140,6 +140,13 @@ def LikeView(request, slug):
     else:
         messages.info(request, "You sould login first")
         return redirect("core-v2:home")
+
+    # context = {
+    #     'is_liked':is_like
+    # }
+
+    # return render(request, 'checkoutv2.html', context)
+
 
 def AnswerDetail(request, slug, id):
     question = get_object_or_404(Question, slug=slug)

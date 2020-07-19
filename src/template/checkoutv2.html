@@ -37,22 +37,16 @@
                         <div style="flex:2"><a href="{{ a.get_answer_url }}"><img class="row-image" src="{{a.image_answer.url}}"></a></div>
                         <div style="flex:2"><p>{{a.username}} 1</p></div>
                         <div style="flex:1"><p>{{a.description}}</p></div>
-                        <div style="flex:1"><p><a href='{{a.get_add_to_vote_url}}' class='btn btn-primary btn-md my-0 p'>add vote here</a></p></div>
-                        <div style="flex:1"><p><a href='{{a.get_remove_to_vote_url}}' class='btn btn-danger btn-md my-0 p'>remove vote here</a></p></div>
+
+
+
+						{% if request.user in a.liked.all %}
+						<div style="flex:1"><p><a href='{{a.get_like_url}}' class='btn btn-primary btn-md my-0 p'>Dislike</a></p></div>
+						{% else %}
+                        <div style="flex:1"><p><a href='{{a.get_like_url}}' class='btn btn-primary btn-md my-0 p'>add vote here</a></p></div>
+						{% endif %}
+                        
                     </div>
-					{% if a.likes.counte %}
-                    <h5>likes:   {{ a.likes.counte }}</h5>
-					{% endif %}
-					{% if a.dislikes.counte %}
-
-                    <h5>dislikes:   {{ a.dislikes.counte }}</h5>
-					{% endif %}
-					{% if a.likes.counte and a.dislikes.counte %}
-                    
-					<h5>Total Likes:   {{a.get_final_vote}} </h5>
-					{% else %}
-
-					{% endif %}
                 </div>
             </div>
         {% endfor %}

@@ -33,6 +33,8 @@
                     <hr>
                     <h3>Answer</h3>
                     <hr>
+
+					
                     <div class="cart-row">
                         <div style="flex:2"><a href="{{ a.get_answer_url }}"><img class="row-image" src="{{a.image_answer.url}}"></a></div>
                         <div style="flex:2"><p>{{a.username}} 1</p></div>
@@ -40,6 +42,8 @@
                         <div style="flex:1"><p><a href='{{a.get_add_to_vote_url}}' class='btn btn-primary btn-md my-0 p'>add vote here</a></p></div>
                         <div style="flex:1"><p><a href='{{a.get_remove_to_vote_url}}' class='btn btn-danger btn-md my-0 p'>remove vote here</a></p></div>
                     </div>
+
+
 					{% if a.likes.counte %}
                     <h5>likes:   {{ a.likes.counte }}</h5>
 					{% endif %}
