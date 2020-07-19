@@ -126,14 +126,15 @@ class Question(models.Model):
 def pre_save_slug_ref_code(sender, instance, *args, **kwargs):
     print("here")
     # if not created:
-    instance.ref_code = create_ref_code()
-    instance.slug = instance.ref_code
-    day = instance.day
-    time = timedelta(days=day)
-    deadline = instance.date + time
-    instance.deadline = deadline
-    
-    print("running")
+    if not instance.ref_code:
+        instance.ref_code = create_ref_code()
+        instance.slug = instance.ref_code
+        day = instance.day
+        time = timedelta(days=day)
+        deadline = instance.date + time
+        instance.deadline = deadline
+        
+        print("running")
 
 pre_save.connect(pre_save_slug_ref_code, sender=Question)
 

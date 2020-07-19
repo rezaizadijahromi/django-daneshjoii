@@ -87,11 +87,9 @@ def AddAnswerToQuestion(request, slug):
     if left_time > 0:
         if request.user.is_authenticated:
             if request.user in question.user_answer.all() or question.answers.all()  :
-                print("We are here")
                 messages.info(request, "You answer this question")
                 return redirect('core-v2:question', slug=slug)
             else:
-                print("here we are")
                 if request.method == 'POST':
                     print("after post method")
                     form = AddAnswerForm(request.POST, request.FILES)
