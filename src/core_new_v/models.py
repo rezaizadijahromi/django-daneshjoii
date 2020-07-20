@@ -108,15 +108,25 @@ class Question(models.Model):
         'Answer',related_name='answered',
         blank=True
     )
-    
-    def get_absolute_url(self):
-        return reverse("core-v2:question", kwargs={"slug": self.slug})
-    
+
     user_answer = models.ManyToManyField(
         User,
         blank=True
     )
 
+    number_of_request = models.ManyToManyField(
+        User,related_name="reuqested",
+        blank=True
+    )
+    
+    def get_absolute_url(self):
+        return reverse("core-v2:question", kwargs={"slug": self.slug})
+    
+    def get_add_request_url(self):
+        return reverse("core-v2:add_request", kwargs={
+            'slug': self.slug
+        }
+    )
     def __str__(self):
         return str(self.ref_code)
     

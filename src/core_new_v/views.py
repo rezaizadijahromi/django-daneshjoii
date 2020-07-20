@@ -64,14 +64,37 @@ def QuetionView(reqeust, slug):
     question = get_object_or_404(Question, slug=slug)
     answer = Answer.objects.filter(question=question)
     time_left = (question.deadline - datetime.now(timezone.utc)).days
+    request_quantity = question.number_of_request.all().count()
+    if request_quantity > 5:
+        context = {
+            'question':question,
+            'answer':answer,
+            'time_left':time_left
+        }
 
-    context = {
-        'question':question,
-        'answer':answer,
-        'time_left':time_left
-    }
+        return render(reqeust, 'checkoutv2.html', context)
+    else:
+        messages.info(reqeust, "This question yet not reached to 5 request ask your friend to request this question")
+        return redirect('core-v2:home')
+        
 
-    return render(reqeust, 'checkoutv2.html', context)
+def AddRequestQuantity(reqeust, slug):
+    question = get_object_or_404(Question, slug=slug)
+    answer = Answer.objects.filter(question=question)
+    time_left = (question.deadline - datetime.now(timezone.utc)).days
+    if reqeust.user.is_authenticated:
+        if reqeust.user in question.number_of_request.all():
+            messages.info(reqeust, "You already request this question")
+            return redirect('core-v2:home')
+        else:
+            question.number_of_request.add(reqeust.user)
+            question.save()
+            messages.info(reqeust, "Your request submited wait until get to 10 requests")
+            return redirect('core-v2:home')
+    else:
+        messages.info(reqeust, "You should authenticate first")
+        return redirect('core-v2:home')
+
 
 def AddAnswerToQuestion(request, slug):
     question = get_object_or_404(Question, slug=slug)
@@ -163,7 +186,8 @@ def AnswerDetail(request, slug, id):
 
 
 
-        
+# Another way to handel this function 
+#       
 # def AddAnswerToQuestion(request, slug):
 #     question = get_object_or_404(Question, slug=slug)
 #     left_time = (question.deadline - datetime.now(timezone.utc)).days
