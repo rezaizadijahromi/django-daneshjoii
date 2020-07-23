@@ -65,7 +65,7 @@ def QuetionView(reqeust, slug):
     answer = Answer.objects.filter(question=question)
     time_left = (question.deadline - datetime.now(timezone.utc)).days
     request_quantity = question.number_of_request.all().count()
-    if request_quantity > 5:
+    if request_quantity > 0:
         context = {
             'question':question,
             'answer':answer,

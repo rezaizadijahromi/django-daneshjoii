@@ -92,6 +92,16 @@ import string
 def create_ref_code():
     return ''.join(random.choices(string.digits, k=5))
 
+class QuestionManager(models.Manager):
+    def question_answerd(self, user, answer_obj):
+        if user in answer_obj.user_answer.all():
+            is_answerd = True
+        else:
+            is_answerd = False
+            answer_obj.user_answer.add(user)
+
+        return is_answerd
+
 class Question(models.Model):
     lesson_name = models.ForeignKey(LessonName, on_delete=models.CASCADE)
     master_name = models.ForeignKey(MasterName, on_delete=models.CASCADE)
@@ -115,9 +125,11 @@ class Question(models.Model):
     )
 
     number_of_request = models.ManyToManyField(
-        User,related_name="reuqested",
+        User,related_name="requested",
         blank=True
     )
+
+    objects = QuestionManager()
     
     def get_absolute_url(self):
         return reverse("core-v2:question", kwargs={"slug": self.slug})
@@ -134,7 +146,7 @@ class Question(models.Model):
     
         
 def pre_save_slug_ref_code(sender, instance, *args, **kwargs):
-    print("here")
+    print("here signals!")
     # if not created:
     if not instance.ref_code:
         instance.ref_code = create_ref_code()

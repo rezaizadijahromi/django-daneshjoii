@@ -22,8 +22,9 @@ class MasterNameSerialzier(serializers.ModelSerializer):
         )
 
 class QuestionSerializer(serializers.ModelSerializer):
-    lesson_name = LessonNameSerializer(many=False)
-    master_name = MasterNameSerialzier(many=False)
+    # lesson_name = serializers.SerializerMethodField()
+    # master_name = MasterNameSerialzier(many=False)
+    number_of_request = serializers.SerializerMethodField()
 
     class Meta:
         model = Question
@@ -31,5 +32,29 @@ class QuestionSerializer(serializers.ModelSerializer):
             'lesson_name', 'master_name',
             'slug','ref_code',
             'image','day',
-            'date', 'deadline'
+            'date', 'deadline',
+            'user_answer', 'number_of_request'
         )
+
+    def get_number_of_request(self, obj):
+        return obj.number_of_request.all().count()
+
+    # def get_lesson_name(self, obj):
+    #     return LessonNameSerializer(obj.lesson_name).data
+
+class AnswerSerializer(serializers.ModelSerializer):
+    # liked = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Answer
+        fields = (
+            'username','description',
+            'image_answer','question',
+            'liked'
+        )
+        read_only_fields = ('username','question')
+
+    # def get_liked(self, obj):
+    #     return obj.liked.all()
+
+    
