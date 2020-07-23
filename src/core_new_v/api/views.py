@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import generics
 from rest_framework import mixins
@@ -79,3 +80,15 @@ class AnswerListAPIView(generics.ListAPIView):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
 
+
+class RequestAPIView(APIView):
+    def get(self, request, slug, format=None):
+        question = get_object_or_404(Question, slug=slug)
+        answer = Answer.objects.filter(question=question)
+        time_left = (question.deadline - datetime.now(timezone.utc)).days
+        if request.user in question.number_of_request.all():
+            return Response({"message":'already requested'})
+        else:
+            question.number_of_request.add(request.user)
+            question.save()
+            return Response({"message":'requested'})
