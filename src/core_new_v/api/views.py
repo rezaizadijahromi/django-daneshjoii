@@ -92,3 +92,12 @@ class RequestAPIView(APIView):
             question.number_of_request.add(request.user)
             question.save()
             return Response({"message":'requested'})
+
+class LikeAPIView(APIView):
+    def get(self, request, pk, format=None):
+        answer_qs = Answer.objects.filter(pk=pk)
+        message = "Not allowed"
+        if request.user.is_authenticated:
+            is_liked = Answer.objects.toggle_like(request.user, answer_qs.first())
+            return Response({"liked":is_liked})
+        return Response({"message": message}, status=400)

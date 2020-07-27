@@ -89,7 +89,7 @@ def AddRequestQuantity(reqeust, slug):
         else:
             question.number_of_request.add(reqeust.user)
             question.save()
-            messages.info(reqeust, "Your request submited wait until get to 10 requests")
+            messages.info(reqeust, "Your request submited wait until get to 5 requests")
             return redirect('core-v2:home')
     else:
         messages.info(reqeust, "You should authenticate first")
@@ -97,6 +97,7 @@ def AddRequestQuantity(reqeust, slug):
 
 
 def AddAnswerToQuestion(request, slug):
+
     question = get_object_or_404(Question, slug=slug)
     left_time = (question.deadline - datetime.now(timezone.utc)).days
 

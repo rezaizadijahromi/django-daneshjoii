@@ -12,7 +12,9 @@ class AddQuetionForm(forms.ModelForm):
             'image', 'day'
         )
 
-class AddAnswerForm(forms.ModelForm):
+class AddAnswerForm(forms.Form):
+
+
     description = forms.CharField(
         widget=forms.Textarea(
             attrs={
